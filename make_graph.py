@@ -1,6 +1,6 @@
 import pydot_ng as pd
 
-from load import load_movedata
+from load import load_movedata, load_map
 
 
 def create_graph(doors):
