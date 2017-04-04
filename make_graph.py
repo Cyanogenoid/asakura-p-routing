@@ -1,6 +1,11 @@
+import os
+
 import pydot_ng as pd
 
 from load import load_movedata, load_map
+
+
+MAP_DIR = './map'
 
 
 def create_graph(doors):
@@ -24,6 +29,13 @@ def create_graph(doors):
     return graph
 
 
-doors = load_movedata('MoveData.dat')
+doors = load_movedata(os.path.join(MAP_DIR, 'MoveData.dat'))
+maps = []
+for floor in doors.keys():
+    path = '{:03d}.map'.format(floor)
+    path = os.path.join(MAP_DIR, path)
+    maps.append(load_map(path))
+
+
 graph = create_graph(doors)
 graph.write_png('test.png')
