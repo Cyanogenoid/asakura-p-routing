@@ -8,17 +8,16 @@ def create_graph(doors):
 
     node_format = '{}F'.format
     nodes = [pd.Node(node_format(i)) for i in doors.keys()]
+    nodes.append(pd.Node('Credits'))
     for node in nodes:
         graph.add_node(node)
 
     for floor, ds in doors.items():
         floor_node = nodes[floor - 1]
         for target_floor, _ in ds:
-            if target_floor == 101:
-                d_node = pd.Node('Credits')
-                graph.add_node(d_node)
-            else:
-                d_node = nodes[target_floor - 1]
+            if target_floor < floor:
+                continue
+            d_node = nodes[target_floor - 1]
             edge = pd.Edge(floor_node, d_node)
             graph.add_edge(edge)
 
