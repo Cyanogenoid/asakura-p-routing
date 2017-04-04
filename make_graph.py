@@ -3,16 +3,21 @@ import pydot_ng as pd
 from load import load_all
 
 
-def apply_style(map):
+def apply_style(floor, map):
     style = {}
-    if map['chest'][-1] == 29:
-        style['fillcolor'] = 'yellow'
-    if map['chest'][-1] == 6:
-        style['color'] = 'yellow'
+    chest_style = {
+         6: {'color': 'orange'},
+        29: {'fillcolor': 'yellow'},
+    }.get(map['chest'][-1], {})
+    shop_style = {'fillcolor': 'orange'} if floor in [8, 43, 63, 97] else {}
+
+    style.update(chest_style)
+    style.update(shop_style)
     return style
 
+
 def create_graph(maps):
-    graph = pd.Dot(graph_type='graph', bgcolor='transparent')
+    graph = pd.Dot(graph_type='graph', bgcolor='white')
 
     nodes = {}
     for floor, map in maps.items():
@@ -21,7 +26,7 @@ def create_graph(maps):
             'style': 'filled',
             'fillcolor': 'white',
         }
-        style.update(apply_style(map))
+        style.update(apply_style(floor, map))
         nodes[floor] = pd.Node(node_name, **style)
     nodes[101] = pd.Node('Credits', **style)
 
