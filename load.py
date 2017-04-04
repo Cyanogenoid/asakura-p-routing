@@ -1,5 +1,23 @@
+import os
 from struct import unpack
 from itertools import zip_longest
+
+
+MAP_DIR = './map'
+
+
+def load_all():
+    doors = load_movedata(os.path.join(MAP_DIR, 'MoveData.dat'))
+    maps = {}
+    for floor in doors.keys():
+        path = '{:03d}.map'.format(floor)
+        path = os.path.join(MAP_DIR, path)
+        maps[floor] = load_map(path)
+    # copy over information from doors to maps
+    for floor, map in maps.items():
+        ds = doors[floor]
+        map['targets'] = ds
+    return maps
 
 
 def load_movedata(path):
