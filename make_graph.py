@@ -1,28 +1,38 @@
-from itertools import tee
+import itertools
 
 import pydot_ng as pd
 
 from load import load_all
 
 
-def apply_style(floor, map):
+def apply_style(floor, map, name):
     style = {}
-    chest_style = {
-         6: {'color': 'orange'},
-        29: {'fillcolor': 'yellow'},
-    }.get(map['chest'][-1], {})
+    label_style = {
+        'label': '''<
+        <table cellborder="0" border="0">
+            <tr>
+                <td>{floor}</td>
+            </tr>
+            <tr>
+                <td><img src="data/st_itemicon{icon_id}.png" scale="TRUE"/></td>
+            </tr>
+        </table>
+        >'''.format(icon_id=map['chest'][-1], floor=name),
+    }
     shop_style = {'fillcolor': 'orange'} if floor in {8, 43, 63, 97} else {}
+    checkpoint_style = {'fillcolor': 'yellow'} if map['chest'][-1] == 29 else {}
     boss_style = {'fillcolor': 'gray'} if floor in {10, 25, 40, 55, 70, 85, 100} else {}
 
-    style.update(chest_style)
+    style.update(label_style)
     style.update(shop_style)
+    style.update(checkpoint_style)
     style.update(boss_style)
     return style
 
 
 def pairwise(iterable):
     "s -> (s0,s1), (s1,s2), (s2, s3), ..."
-    a, b = tee(iterable)
+    a, b = itertools.tee(iterable)
     next(b, None)
     return zip(a, b)
 
@@ -38,18 +48,26 @@ def apply_edge_style(a, b):
 
 
 def create_graph(maps):
-    graph = pd.Dot(graph_type='graph', bgcolor='white')
+    graph_args = {
+        'graph_type': 'graph',
+        'bgcolor': 'white',
+        'overlap': 'scale',
+    }
+    default_style = {
+        'style': 'filled',
+        'fillcolor': 'white',
+        'shape': 'box',
+        'margin': 0,
+    }
+    graph = pd.Dot(**graph_args)
 
     nodes = {}
     for floor, map in maps.items():
         node_name = '{}F'.format(floor)
-        style = {
-            'style': 'filled',
-            'fillcolor': 'white',
-        }
-        style.update(apply_style(floor, map))
+        style = dict(default_style)
+        style.update(apply_style(floor, map, node_name))
         nodes[floor] = pd.Node(node_name, **style)
-    nodes[101] = pd.Node('Credits', **style)
+    nodes[101] = pd.Node('Credits', **default_style)
 
     for node in nodes.values():
         graph.add_node(node)
@@ -70,4 +88,4 @@ def create_graph(maps):
 
 maps = load_all()
 graph = create_graph(maps)
-graph.write_png('test.png')
+graph.write('test.dot')
