@@ -67,18 +67,3 @@ class Process():
     def __exit__(self, *args):
         windll.kernel32.CloseHandle(self.handle)
         del self.handle
-
-
-import time
-address = 0x5B40A0
-
-with Process(name='AssaCrip_en.exe') as process:
-    i = 0
-    for i in range(100):
-        for i in range(41):
-            process.write_int32(address, i)
-            print('x position', process.read_double(0x5B3FA0))
-            time.sleep(0.05)
-        for i in reversed(range(1, 40)):
-            process.write_int32(address, i)
-            time.sleep(0.05)
