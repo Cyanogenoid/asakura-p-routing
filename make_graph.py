@@ -51,7 +51,9 @@ def create_graph(maps):
     graph_args = {
         'graph_type': 'graph',
         'bgcolor': 'white',
-        'overlap': 'scale',
+        'overlap': 'prism',
+        'overlap_scaling': 10,
+        'ratio': 1.5,
     }
     default_style = {
         'style': 'filled',
