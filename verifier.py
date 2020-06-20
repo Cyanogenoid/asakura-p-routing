@@ -22,8 +22,11 @@ def check_line(state, line):
         yield ValueError('Invalid floor specifier')
     room = int(room[:-1])
     # floor transition
-    if room not in MAPS[state.previous_room]['targets'] and MAPS[room]['chest'][-1] != 29:
-        yield ValueError('Impossible room transition from {} to {}')
+    if room not in MAPS[state.previous_room]['targets']:
+        if MAPS[room]['chest'][-1] != 29:
+            yield ValueError(f'Impossible room transition from {state.previous_room} to {room}')
+        elif room not in state.chests:
+            yield ValueError(f'Checkpoint not yet collected in {room}')
     # actions
     for action in actions:
         yield from check_action(state, room, action)
