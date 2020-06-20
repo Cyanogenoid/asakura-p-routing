@@ -1,5 +1,4 @@
 import sys
-from warnings import Warning
 
 from load import load_all
 
@@ -13,16 +12,30 @@ class State:
     def __init__(self):
         self.keys = set()
         self.chests = set()
-        self.previous_room = 1
+        self.previous_room = None
 
 
 def check_line(state, line):
-    room, actions = line.split(' ')
+    line = line.split('#')[0].strip()
+    if not line:
+        return
+    
+    components = line.split(' ')
+    if len(components) == 1:
+        room = components[0]
+        actions = ''
+    else:
+        room, actions = components
+        
     if room[-1] != 'F':
         yield ValueError('Invalid floor specifier')
-    room = int(room[:-1])
+    if room[0] == '?':
+        room = None
+    else:
+        room = int(room[:-1])
+
     # floor transition
-    if room not in MAPS[state.previous_room]['targets']:
+    if room is not None and state.previous_room is not None and room not in {floor for floor, _ in MAPS[state.previous_room]['targets']}:
         if MAPS[room]['chest'][-1] != 29:
             yield ValueError(f'Impossible room transition from {state.previous_room} to {room}')
         elif room not in state.chests:
@@ -30,6 +43,7 @@ def check_line(state, line):
     # actions
     for action in actions:
         yield from check_action(state, room, action)
+
     state.previous_room = room
 
 
@@ -37,7 +51,7 @@ def check_action(state, room, action):
     if action == 'k':
         # key already collected? (possible with glitch, so only warn)
         if room in state.keys:
-            yield Warning(f'Key already collected on {room}F')
+            yield ValueError(f'Warning, key already collected on {room}F')
         state.keys.add(room)
     elif action == 'c':
         # chest already collected?
@@ -66,10 +80,9 @@ def check_final_state(state):
 
 state = State()
 for i, line in enumerate(open(path, 'r')):
-    if line:
-        for problem in check_line(state, line):
-            if isinstance(problem, ValueError):
-                print(f'Line {i}: {problem}')
+    for problem in check_line(state, line):
+        if isinstance(problem, ValueError):
+            print(f'Line {i}: {problem}')
 
 for problem in check_final_state(state):
     if isinstance(problem, ValueError):
