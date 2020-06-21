@@ -19,6 +19,14 @@ def check_line(state, line):
     line = line.split('#')[0].strip()
     if not line:
         return
+    if line.startswith('status'):
+        coin_floors = {x for x in range(1, 101) if MAPS[x]['chest'][-1] == MAPS[1]['chest'][-1]}
+        print(f'''\
+{line}
+keys: {len(state.keys)}
+chests: {len(state.chests)}
+coins: {len(state.chests & coin_floors)}''')
+        return
     
     components = line.split(' ')
     if len(components) == 1:
