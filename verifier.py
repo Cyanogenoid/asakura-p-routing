@@ -79,7 +79,7 @@ def check_final_state(state):
 
 
 state = State()
-for i, line in enumerate(open(path, 'r')):
+for i, line in enumerate(open(path, 'r'), start=1):
     for problem in check_line(state, line):
         if isinstance(problem, ValueError):
             print(f'Line {i}: {problem}')
