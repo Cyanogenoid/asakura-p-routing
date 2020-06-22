@@ -10,9 +10,28 @@ MAPS = load_all()
 
 class State:
     def __init__(self):
+        self.coin_floors = {x for x in range(1, 101) if MAPS[x]['chest'][-1] == MAPS[1]['chest'][-1]}
+        self.mp_floors = {x for x in range(1, 101) if MAPS[x]['chest'][-1] == MAPS[5]['chest'][-1]}
+        self.shop_costs = {
+            8: 8,
+            43: 15,
+            63: 13,
+            97: 15,
+        }
+
         self.keys = set()
         self.chests = set()
         self.previous_room = None
+        self.coins_used = 0
+
+    @property
+    def coins_available(self):
+        return len(state.chests & self.coin_floors) - self.coins_used
+
+    @property
+    def mp_available(self):
+        return 16 + len(state.chests & self.mp_floors) + 2 * (4 - len(self.shop_costs))
+
 
 
 def check_line(state, line):
@@ -20,12 +39,12 @@ def check_line(state, line):
     if not line:
         return
     if line.startswith('status'):
-        coin_floors = {x for x in range(1, 101) if MAPS[x]['chest'][-1] == MAPS[1]['chest'][-1]}
         print(f'''\
 {line}
 keys: {len(state.keys)}
 chests: {len(state.chests)}
-coins: {len(state.chests & coin_floors)}''')
+coins: {state.coins_available}
+mp: {state.mp_available}''')
         return
     
     components = line.split(' ')
@@ -69,6 +88,15 @@ def check_action(state, room, action):
         if len(state.chests) >= len(state.keys):
             yield ValueError(f'Not enough keys to collect chest on {room}F')
         state.chests.add(room)
+    elif action == 's':
+        price = state.shop_costs.get(room)
+        if not price:
+            yield ValueError(f'Nothing to buy on {room}F')
+        if price > state.coins_available:
+            yield ValueError(f'Not enough to buy out shop on {room}F')
+        state.coins_used += price
+        del state.shop_costs[room]
+
 
 
 def check_final_state(state):
