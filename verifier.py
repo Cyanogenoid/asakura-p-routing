@@ -93,7 +93,7 @@ def check_action(state, room, action):
         if not price:
             yield ValueError(f'Nothing to buy on {room}F')
         if price > state.coins_available:
-            yield ValueError(f'Not enough to buy out shop on {room}F')
+            yield ValueError(f'Not enough coins to buy out shop on {room}F')
         state.coins_used += price
         del state.shop_costs[room]
 
