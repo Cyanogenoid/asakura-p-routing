@@ -1,4 +1,5 @@
 import re
+import sys
 
 from z3 import *
 
@@ -135,6 +136,7 @@ for section_name in sections:
 
 opt = Optimize()
 set_param(verbose=1)
+set_param('smt.random_seed', int(sys.argv[1]))
 
 # enforce permutation
 opt.add(Distinct(*vars.values()))
