@@ -184,12 +184,12 @@ for from_section, from_var in vars.items():
 
 # soft constraints
 ## stability pendant before sections with inertia
-opt.add_soft(vars['64-63'] < vars['56-58'])
-opt.add_soft(vars['64-63'] < vars['64-68'])
-opt.add_soft(vars['64-63'] < vars['98-94'])
+opt.add(vars['64-63'] < vars['56-58'])
+opt.add(vars['64-63'] < vars['64-68'])
+opt.add(vars['64-63'] < vars['98-94'])
 ## guard shield before sections with lots of shooting (i.e. mini bosses)
-opt.add_soft(vars['76-79'] < vars['98-94'])
-opt.add_soft(vars['76-79'] < vars['98-91'])
+opt.add(vars['76-79'] < vars['98-94'])
+opt.add(vars['76-79'] < vars['98-91'])
 
 # cursor distance to minimise
 def distance(x, y):
