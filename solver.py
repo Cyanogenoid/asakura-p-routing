@@ -199,7 +199,7 @@ opt.add(vars['76-79'] < vars['98-94'])
 opt.add(vars['76-79'] < vars['98-91'])
 
 # cursor distance to minimise
-def distance(x, y):
+def menu_distance(x, y):
     x2 = x - 1
     y2 = y - 1
     dist_horizontal = abs(x2 % 10 - y2 % 10)
@@ -213,19 +213,29 @@ for from_section, from_var in vars.items():
             continue
         from_floor = sections[from_section].end_floor
         to_floor = sections[to_section].start_floor
-        term = If(from_var + 1 == to_var, distance(from_floor, to_floor), 0)
+        term = If(from_var + 1 == to_var, menu_distance(from_floor, to_floor), 0)
         terms.append(term)
 
-opt.minimize(Sum(*terms))
-print(opt.check())
+# opt.minimize(Sum(*terms))
+check_result = opt.check()
 model = opt.model()
-print(model)
+print(opt.statistics())
+print()
+print(check_result)
 print()
 
-total_slack = sum(str(model[x]) == 'True' for x in slack_variables)
-print(f'wrong warp slack: {total_slack}')
-print()
 
 best_sequence = sorted(vars.keys(), key=lambda x: model[vars[x]].as_long())
 for section in best_sequence:
     print(repr(sections[section]))
+print()
+
+total_slack = sum(str(model[x]) == 'True' for x in slack_variables)
+solution_length = 0
+for i in range(1, len(best_sequence)):
+    left = best_sequence[i - 1]
+    right = best_sequence[i]
+    solution_length += menu_distance(sections[left].end_floor, sections[right].start_floor)
+
+print(f'wrong warp slack: {total_slack}')
+print(f'solution length: {solution_length}')
