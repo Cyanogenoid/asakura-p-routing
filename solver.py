@@ -216,7 +216,7 @@ for from_section, from_var in vars.items():
         term = If(from_var + 1 == to_var, menu_distance(from_floor, to_floor), 0)
         terms.append(term)
 
-# opt.minimize(Sum(*terms))
+opt.minimize(Sum(*terms))
 check_result = opt.check()
 model = opt.model()
 print(opt.statistics())
