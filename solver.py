@@ -174,12 +174,12 @@ for from_section, from_var in vars.items():
     for to_section, to_var in vars.items():
         if sections[to_section].start_id == 0:
             continue
-        term = If(
-            from_var + 1 == to_var,
-            sections[from_section].end_id == sections[to_section].start_id,
-            True,
-        )
-        opt.add(term)
+        is_adjacent = from_var + 1 == to_var
+        is_chaining = sections[from_section].end_id == sections[to_section].start_id
+        # if they are chained, then we don't care whether they are actually adjacent or not, it's automatically satisfied
+        # only when they are not chained do we have to make sure that they are also not adjacent
+        if not is_chaining:
+            opt.add_soft(Not(is_adjacent))
 
 # soft constraints
 ## stability pendant before sections with inertia
