@@ -171,16 +171,23 @@ opt.add(vars['28-30b'] < vars['28-30'])
 opt.add(vars['28-30b'] < vars['28-26'])
 
 # wrong warp chaining
+slack_variables = []
 for from_section, from_var in vars.items():
     for to_section, to_var in vars.items():
         if sections[to_section].start_id == 0:
             continue
         is_adjacent = from_var + 1 == to_var
         is_chaining = sections[from_section].end_id == sections[to_section].start_id
+        # allow for a bit of slack, like in SVMs
+        # manual solution has 2 slack
+        slack = Bool(f'{from_section} {to_section} slack')
+        slack_variables.append(slack)
         # if they are chained, then we don't care whether they are actually adjacent or not, it's automatically satisfied
         # only when they are not chained do we have to make sure that they are also not adjacent
         if not is_chaining:
-            opt.add_soft(Not(is_adjacent))
+            opt.add(Xor(Not(is_adjacent), slack))
+# constraint on maximum slack
+opt.add(PbEq([(x, 1) for x in slack_variables], 2))
 
 # soft constraints
 ## stability pendant before sections with inertia
