@@ -156,7 +156,7 @@ for i in range(1, len(vars)):
     opt.add(Sum(*before) >= current)
 
 # shop coin constraints
-shop_sections = ['15-8', '41-42', '64-63']
+shop_sections = ['15-8', '41-44', '64-63']
 for section in shop_sections:
     var = vars[section]
     coins_already_spent = [If(vars[s] < var, SHOP_COSTS[s], 0) for s in shop_sections if s != section]
