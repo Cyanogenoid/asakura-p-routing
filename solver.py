@@ -222,5 +222,10 @@ model = opt.model()
 print(model)
 print()
 
+total_slack = sum(str(model[x]) == 'True' for x in slack_variables)
+print(f'wrong warp slack: {total_slack}')
+print()
+
 best_sequence = sorted(vars.keys(), key=lambda x: model[vars[x]].as_long())
-print(best_sequence)
+for section in best_sequence:
+    print(repr(sections[section]))
