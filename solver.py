@@ -134,6 +134,7 @@ for section_name in sections:
 
 
 opt = Optimize()
+set_param(verbose=1)
 
 # enforce permutation
 opt.add(Distinct(*vars.values()))
