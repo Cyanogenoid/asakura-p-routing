@@ -117,7 +117,7 @@ with open('R2.md', 'r') as fd:
     s = fd.read()
 sections = parse(s)
 sections.append(Section(
-    '98', '96',
+    '98', '97',
     0, 0,
     0, 3,
     0, 2,
@@ -143,8 +143,8 @@ opt.add(Distinct(*vars.values()))
 opt.add([0 <= x for x in vars.values()])
 opt.add([x < len(vars) for x in vars.values()])
 
-# start with 98-96, end with 98-100
-opt.add(vars['98-96'] == 0)
+# start with 98-97, end with 98-100
+opt.add(vars['98-97'] == 0)
 opt.add(vars['98-100'] == len(vars) - 1)
 
 # key count constraints
