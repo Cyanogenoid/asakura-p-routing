@@ -214,8 +214,8 @@ opt.add(vars['76-79'] < vars['98-91'])
 
 # we know that 41-44 either has to be last (it's a shop), or the only thing after it is 56-58 (no coins collected here)
 opt.add(Or(
-    vars['41-44'] == len(variables) - 2,
-    And(vars['41-44'] == len(variables) - 3, vars['56-58'] == len(variables) - 2),
+    vars['41-44'] == len(vars) - 2,
+    And(vars['41-44'] == len(vars) - 3, vars['56-58'] == len(vars) - 2),
 ))
 
 # cursor distance to minimise
