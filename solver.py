@@ -182,18 +182,24 @@ opt.add(vars['28-30b'] < vars['28-26'])
 slack_variables = []
 for from_section, from_var in vars.items():
     for to_section, to_var in vars.items():
+        # can always teleport to id 0
         if sections[to_section].start_id == 0:
             continue
         is_adjacent = from_var + 1 == to_var
         is_chaining = sections[from_section].end_id == sections[to_section].start_id
-        # allow for a bit of slack, like in SVMs
-        # manual solution has 2 slack
-        slack = Bool(f'{from_section} {to_section} slack')
-        slack_variables.append(slack)
+        # allow for a bit of slack since perfect solution isn't possible, like in SVMs
+        # perfect solution has 2 slack
+        allow_slack = sections[to_section].start_id == 1
+        if allow_slack:
+            slack = Bool(f'{from_section} {to_section} slack')
+            slack_variables.append(slack)
         # if they are chained, then we don't care whether they are actually adjacent or not, it's automatically satisfied
         # only when they are not chained do we have to make sure that they are also not adjacent
         if not is_chaining:
-            opt.add(Xor(Not(is_adjacent), slack))
+            constraint = Not(is_adjacent)
+            if allow_slack:
+                constraint = Xor(constraint, slack)
+            opt.add(constraint)
 # constraint on maximum slack
 opt.add(PbEq([(x, 1) for x in slack_variables], 2))
 
@@ -205,6 +211,12 @@ opt.add(vars['64-63'] < vars['98-94'])
 ## guard shield before sections with lots of shooting (i.e. mini bosses)
 opt.add(vars['76-79'] < vars['98-94'])
 opt.add(vars['76-79'] < vars['98-91'])
+
+# we know that 41-44 either has to be last (it's a shop), or the only thing after it is 56-58 (no coins collected here)
+opt.add(Or(
+    vars['41-44'] == len(variables) - 2,
+    And(vars['41-44'] == len(variables) - 3, vars['56-58'] == len(variables) - 2),
+))
 
 # cursor distance to minimise
 def menu_distance(x, y):
