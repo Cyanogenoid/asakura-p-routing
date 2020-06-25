@@ -6,6 +6,9 @@ from z3 import *
 from load import load_all
 
 
+MAX_COST = int(sys.argv[1])
+SEED = int(sys.argv[2])
+
 MAPS = load_all()
 COIN_FLOORS = {x for x in range(1, 101) if MAPS[x]['chest'][-1] == MAPS[1]['chest'][-1]}
 MP_FLOORS = {x for x in range(1, 101) if MAPS[x]['chest'][-1] == MAPS[5]['chest'][-1]}
@@ -140,9 +143,9 @@ for section_name in sections:
     vars[section_name] = Int(section_name)
 
 
-opt = Optimize()
+opt = Solver()
 set_param(verbose=1)
-set_param('smt.random_seed', int(sys.argv[1]))
+set_param('smt.random_seed', SEED)
 
 # enforce permutation
 opt.add(Distinct(*vars.values()))
@@ -236,7 +239,7 @@ for from_section, from_var in vars.items():
         term = If(from_var + 1 == to_var, menu_distance(from_floor, to_floor), 0)
         terms.append(term)
 
-opt.minimize(Sum(*terms))
+opt.add(Sum(*terms) < MAX_COST)
 check_result = opt.check()
 model = opt.model()
 print(opt.statistics())
