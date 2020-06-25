@@ -24,6 +24,12 @@ SHOP_COSTS = {
 
     97: 15,
 }
+TRANSITION_1_TO = {
+    4, 28,
+}
+TRANSITION_1_FROM = {
+    '4-1', '98-94', '64-68', '28-30', '56-58', '98-91'
+}
 
 class Section:
     def __init__(self, start_floor, end_floor, start_id, end_id, required_keys, end_keys, required_coins, added_coins, added_mp=0):
@@ -192,7 +198,7 @@ for from_section, from_var in vars.items():
         is_chaining = sections[from_section].end_id == sections[to_section].start_id
         # allow for a bit of slack since perfect solution isn't possible, like in SVMs
         # perfect solution has 2 slack
-        allow_slack = sections[to_section].start_id == 1
+        allow_slack = sections[to_section].start_id == 1 and (from_section in TRANSITION_1_FROM or sections[to_section].start_id in TRANSITION_1_TO)
         if allow_slack:
             slack = Bool(f'{from_section} {to_section} slack')
             slack_variables.append(slack)
@@ -215,11 +221,8 @@ opt.add(vars['64-63'] < vars['98-94'])
 opt.add(vars['76-79'] < vars['98-94'])
 opt.add(vars['76-79'] < vars['98-91'])
 
-# we know that 41-44 either has to be last (it's a shop), or the only thing after it is 56-58 (no coins collected here)
-opt.add(Or(
-    vars['41-44'] == len(vars) - 2,
-    And(vars['41-44'] == len(vars) - 3, vars['56-58'] == len(vars) - 2),
-))
+# transition to 56-58 is bad because loading time on 55 is long, so only option left is 41-44 last
+opt.add(vars['41-44'] == len(vars) - 2)
 
 # cursor distance to minimise
 def menu_distance(x, y):
@@ -239,7 +242,7 @@ for from_section, from_var in vars.items():
         term = If(from_var + 1 == to_var, menu_distance(from_floor, to_floor), 0)
         terms.append(term)
 
-opt.add(Sum(*terms) < MAX_COST)
+opt.add(Sum(*terms) <= MAX_COST)
 check_result = opt.check()
 model = opt.model()
 print(opt.statistics())
