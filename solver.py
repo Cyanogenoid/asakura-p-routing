@@ -8,6 +8,7 @@ from load import load_all
 
 MAPS = load_all()
 COIN_FLOORS = {x for x in range(1, 101) if MAPS[x]['chest'][-1] == MAPS[1]['chest'][-1]}
+MP_FLOORS = {x for x in range(1, 101) if MAPS[x]['chest'][-1] == MAPS[5]['chest'][-1]}
 SHOP_COSTS = {
     '15-8': 8,
     8: 8,
@@ -22,7 +23,7 @@ SHOP_COSTS = {
 }
 
 class Section:
-    def __init__(self, start_floor, end_floor, start_id, end_id, required_keys, end_keys, required_coins, added_coins):
+    def __init__(self, start_floor, end_floor, start_id, end_id, required_keys, end_keys, required_coins, added_coins, added_mp=0):
         self.start_floor = int(start_floor)
         if end_floor[-1] == 'b':
             self.end_postfix = 'b'
@@ -36,12 +37,13 @@ class Section:
         self.end_keys = int(end_keys)
         self.required_coins = int(required_coins)
         self.added_coins = int(added_coins)
+        self.added_mp = int(added_mp)
 
     def __str__(self):
         return f'{self.start_floor}-{self.end_floor}{self.end_postfix}'
 
     def __repr__(self):
-        return f'{self.start_floor}-{self.end_floor}{self.end_postfix} {self.required_keys}k{self.end_keys} {self.added_coins}c {self.required_coins}s [{self.start_id}-{self.end_id}]'
+        return f'{self.start_floor}-{self.end_floor}{self.end_postfix} {self.required_keys}k{self.end_keys} {self.added_coins}c {self.required_coins}s {self.added_mp}m [{self.start_id}-{self.end_id}]'
 
 
 def parse(s):
@@ -72,6 +74,7 @@ def parse(s):
         current_key_delta = 0
         min_delta = 0
         added_coins = 0
+        added_mp = 0
         required_coins = 0
         for line in section[1:]:
             main = line.split('#')[0]
@@ -93,6 +96,8 @@ def parse(s):
                     current_key_delta -= 1
                     if floor in COIN_FLOORS:
                         added_coins += 1
+                    elif floor in MP_FLOORS:
+                        added_mp += 1
                 elif action == 's':
                     required_coins = SHOP_COSTS[floor] - added_coins
 
@@ -109,6 +114,7 @@ def parse(s):
             end_keys=end_keys,
             required_coins=required_coins,
             added_coins=added_coins,
+            added_mp=added_mp,
         ))
     return objects
 
