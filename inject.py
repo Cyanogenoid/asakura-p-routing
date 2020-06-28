@@ -55,8 +55,11 @@ class Process():
 
     def pid(self, name):
         for process in psutil.process_iter():
-            if process.name() == name:
-                return process.pid
+            try:
+                if process.name() == name:
+                    return process.pid
+            except psutil.AccessDenied:
+                pass
         else:
             raise RuntimeError('No running process called "{}" found'.format(name))
 
