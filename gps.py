@@ -135,7 +135,7 @@ class GPS(object):
             while entry.floor == self.game.floor():
                 output_lines = []
 
-                output_lines.append(f'\033[2J{entry.section}')
+                output_lines.append(entry.section)
                 output_lines.append('')
 
                 entries_before = self.route[max(entry_index - self.context_past, 0):entry_index]
