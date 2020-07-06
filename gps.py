@@ -125,9 +125,7 @@ class GPS(object):
         return floors
                     
     def run(self):
-        done = False
         last_output = None
-        past_current_floors = []
         print(f'Waiting for {self.route[0].floor}F')
         entry_index = 0
         while True:
