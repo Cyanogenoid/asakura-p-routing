@@ -125,9 +125,11 @@ class GPS(object):
         return floors
                     
     def run(self):
+        entry_index = 0
         last_output = None
         print(f'Waiting for {self.route[0].floor}F')
-        entry_index = 0
+        while self.game.floor() != self.route[entry_index].floor:
+            time.sleep(0.1)
         while True:
             game_floor = self.game.floor()
             if entry_index + 1 < len(self.route) and game_floor == self.route[entry_index + 1].floor:
