@@ -34,6 +34,9 @@ names = [
     'sapphire',
     'emerald',
     'diamond',
+    'airdash',
+    'nothing',
+    'checkflag',
 ]
 
 k = 0
