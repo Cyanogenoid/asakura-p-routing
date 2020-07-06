@@ -129,10 +129,13 @@ class GPS(object):
         last_output = None
         past_current_floors = []
         print(f'Waiting for {self.route[0].floor}F')
-        for entry_index, entry in enumerate(self.route):
-            while entry.floor != self.game.floor():
-                time.sleep(0.1) 
-            while entry.floor == self.game.floor():
+        entry_index = 0
+        while True:
+            game_floor = self.game.floor()
+            if entry_index + 1 < len(self.route) and game_floor == self.route[entry_index + 1].floor:
+                entry_index += 1
+            entry = self.route[entry_index]
+            if game_floor == entry.floor:
                 output_lines = []
 
                 output_lines.append(entry.section)
@@ -163,7 +166,7 @@ class GPS(object):
                     last_output = output
                     print(output)
 
-                time.sleep(0.1)
+            time.sleep(0.1)
 
     def format_entry(self, entry, next_entry=None, style=Style.NORMAL, coloured_floor=True):
         b = self.game.has_bubble_key(entry.floor) or self.game.boss_beaten(entry.floor)
